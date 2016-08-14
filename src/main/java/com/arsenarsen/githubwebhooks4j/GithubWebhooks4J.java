@@ -4,11 +4,17 @@ import com.arsenarsen.githubwebhooks4j.events.CommitCommentEvent;
 import com.arsenarsen.githubwebhooks4j.events.EventListener;
 import com.arsenarsen.githubwebhooks4j.events.GithubEvent;
 import com.arsenarsen.githubwebhooks4j.events.UnresolvedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -27,11 +33,19 @@ import static spark.Spark.*;
  */
 public class GithubWebhooks4J {
 
+    public static final Logger GHWHLOGGER = LoggerFactory.getLogger(GithubWebhooks4J.class);
     public static final String SHA_1 = "HmacSHA1";
     public static final char[] HEX_CHARS = "0123456789abcdef".toCharArray();
     private static final Map<String, Class<? extends GithubEvent>> events = new ConcurrentHashMap<>();
 
     static {
+        try {
+            BufferedReader fromWebpage = new BufferedReader(new InputStreamReader(new URL("https://api.github.com/zen").openStream()));
+            GHWHLOGGER.debug(fromWebpage.readLine());
+        } catch (IOException e) {
+            System.err.println("Could not connect to GitHub ZEN API! If it is down, you can just ignore this error. This was put here just because");
+            e.printStackTrace();
+        }
         events.put("commit_comment", CommitCommentEvent.class);
     }
 
@@ -46,13 +60,17 @@ public class GithubWebhooks4J {
         if (ip != null) ipAddress(ip);
         if (port != -1) port(port);
         post(request, (req, res) -> {
-            if (!"application/json".equals(req.headers("Content-Type"))) {
-                res.status(500);
+            if (!req.headers("Content-Type").equals("application/json")) {
+                GHWHLOGGER.error("There was an attempt to make a non JSON POST request! The request type was: " + req.headers("Content-Type"));
+                res.status(400);
                 return "Content-Type must be application/json!";
             }
             if (!secret.equals("")) {
                 String signedMessage = req.headers("X-Hub-Signature");
+                if (signedMessage == null)
+                    signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ"; // Ignore that long Base64 string
                 if (!hmacSha1Hex(secret, req.body()).equalsIgnoreCase(signedMessage)) {
+                    GHWHLOGGER.error("There was an attempt to make an unauthorized request!");
                     res.status(401);
                     return "Unauthorized access!";
                 }
@@ -66,6 +84,7 @@ public class GithubWebhooks4J {
 
             event.parse(req.body());
 
+            int dispatched = 0;
             for (EventListener listener : listeners) {
                 Method handle;
                 try {
@@ -73,10 +92,12 @@ public class GithubWebhooks4J {
                 } catch (NoSuchMethodException ignored) {
                     continue;
                 }
+                dispatched++;
+                GHWHLOGGER.info("Dispatching " + listener.getClass().getSimpleName());
                 handle.invoke(listener, event);
             }
 
-            return "";
+            return "\uD83D\uDC4C PERFECT! Dispatched handler count: " + dispatched;
         });
     }
 
