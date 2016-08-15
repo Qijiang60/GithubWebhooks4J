@@ -24,4 +24,5 @@ public class RecieverTestClass {
             return ":+1: OK!";
         });
     }
+
 }

@@ -1,9 +1,6 @@
 package com.arsenarsen.githubwebhooks4j;
 
-import com.arsenarsen.githubwebhooks4j.events.CommitCommentEvent;
-import com.arsenarsen.githubwebhooks4j.events.EventListener;
-import com.arsenarsen.githubwebhooks4j.events.GithubEvent;
-import com.arsenarsen.githubwebhooks4j.events.UnresolvedEvent;
+import com.arsenarsen.githubwebhooks4j.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +44,8 @@ public class GithubWebhooks4J {
             e.printStackTrace();
         }
         events.put("commit_comment", CommitCommentEvent.class);
+        events.put("create", CreateEvent.class);
+        events.put("delete", DeleteEvent.class);
     }
 
     private Set<EventListener> listeners = new HashSet<>();

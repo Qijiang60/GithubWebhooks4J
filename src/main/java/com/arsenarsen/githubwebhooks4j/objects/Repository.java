@@ -336,18 +336,35 @@ public class Repository {
         return open_issues_count;
     }
 
+    /**
+     * Get fork count
+     *
+     * @return The repository fork count
+     */
     public int getForks() {
         return forks;
     }
 
+    /**
+     * Gets the open issues count
+     * @return The open issues count
+     */
     public int getOpenIssues() {
         return open_issues;
     }
 
+    /**
+     * Gets the watcher count for the repository
+     * @return The watcher count
+     */
     public int getWatchers() {
         return watchers;
     }
 
+    /**
+     * Gets the default branch for the repository
+     * @return The default branch for the repository
+     */
     public String getDefaultBranch() {
         return default_branch;
     }

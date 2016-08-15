@@ -8,7 +8,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * Triggered when a commit comment is created.
+ * Triggered when a commit comment is created.<br>
+ * Look here: https://developer.github.com/v3/activity/events/types/#commitcommentevent
  * <br>
  * Created by Arsen on 14.8.2016..
  */
