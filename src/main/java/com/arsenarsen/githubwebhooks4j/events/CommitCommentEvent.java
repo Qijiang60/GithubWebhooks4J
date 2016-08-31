@@ -3,7 +3,6 @@ package com.arsenarsen.githubwebhooks4j.events;
 import com.arsenarsen.githubwebhooks4j.objects.Comment;
 import com.arsenarsen.githubwebhooks4j.objects.Repository;
 import com.arsenarsen.githubwebhooks4j.objects.User;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -21,7 +20,6 @@ public class CommitCommentEvent extends GithubEvent {
 
     @Override
     public void parse(String body) {
-        Gson gson = new Gson();
         JsonObject response = new JsonParser().parse(body).getAsJsonObject();
         action = response.get("action").getAsString();
         comment = gson.fromJson(response.get("comment"), Comment.class);

@@ -1,16 +1,16 @@
 package com.arsenarsen.githubwebhooks4j;
 
 import com.arsenarsen.githubwebhooks4j.events.*;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
+import java.io.*;
 import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -19,8 +19,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static spark.Spark.*;
 
 /**
  * GitHub webhooks main class, containing an interface to pretty much everything
@@ -37,17 +35,21 @@ public class GithubWebhooks4J {
 
     static {
         try {
-            BufferedReader fromWebpage = new BufferedReader(new InputStreamReader(new URL("https://api.github.com/zen").openStream()));
+            BufferedReader fromWebpage = new BufferedReader(new InputStreamReader(new URL("https://api.github" +
+                    ".com/zen").openStream()));
             GHWHLOGGER.debug(fromWebpage.readLine());
         } catch (IOException e) {
-            System.err.println("Could not connect to GitHub ZEN API! If it is down, you can just ignore this error. This was put here just because");
-            e.printStackTrace();
+            GHWHLOGGER.error("Could not connect to GitHub ZEN API! If it is down, you can just ignore this error. " +
+                    "This was put here just because", e);
         }
         events.put("commit_comment", CommitCommentEvent.class);
         events.put("create", CreateEvent.class);
         events.put("delete", DeleteEvent.class);
+        events.put("push", PushEvent.class);
     }
 
+    private HttpServer server;
+    private String secret;
     private Set<EventListener> listeners = new HashSet<>();
 
     // Locks the default constructor
@@ -55,49 +57,76 @@ public class GithubWebhooks4J {
     }
 
     // Use the builder
-    GithubWebhooks4J(String request, final String secret, int port, String ip) {
-        if (ip != null) ipAddress(ip);
-        if (port != -1) port(port);
-        post(request, (req, res) -> {
-            if (!req.headers("Content-Type").equals("application/json")) {
-                GHWHLOGGER.error("There was an attempt to make a non JSON POST request! The request type was: " + req.headers("Content-Type"));
-                res.status(400);
-                return "Content-Type must be application/json!";
+    GithubWebhooks4J(String request, final String secret, int port, String ip) throws IOException {
+//        if(!(request.charAt(0) == '/'))
+//            request = '/' + request;
+        this.secret = secret;
+        if (ip == null)
+            server = HttpServer.create(new InetSocketAddress(port), 0);
+        else
+            server = HttpServer.create(new InetSocketAddress(ip, port), 0);
+
+        server.createContext(request, httpExchange -> {
+            Response res = callHooks(httpExchange);
+            httpExchange.sendResponseHeaders(res.code, res.response.length());
+            httpExchange.getResponseBody().write(res.response.getBytes());
+            httpExchange.getResponseBody().close();
+        });
+        server.setExecutor(null);
+        server.start();
+    }
+
+    private Response callHooks(HttpExchange httpExchange) {
+        try {
+            BufferedReader r = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody()));
+            String line, body = "";
+            while ((line = r.readLine()) != null)
+                body += line;
+            if (!httpExchange.getRequestHeaders().getFirst("Content-Type").equals("application/json")) {
+                GHWHLOGGER.error("There was an attempt to make a non JSON POST request! The request type was: " +
+                        httpExchange.getRequestHeaders().getFirst("Content-Type"));
+                return new Response("Content-Type must be application/json!", 400);
             }
             if (!secret.equals("")) {
-                String signedMessage = req.headers("X-Hub-Signature");
+                String signedMessage = httpExchange.getRequestHeaders().getFirst("X-Hub-Signature");
                 if (signedMessage == null)
-                    signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ"; // Ignore that long Base64 string
-                if (!hmacSha1Hex(secret, req.body()).equalsIgnoreCase(signedMessage)) {
+                    signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ" +
+                            ""; // Ignore that long Base64 string
+                if (!("sha1=" + hmacSha1Hex(secret, body)).equalsIgnoreCase(signedMessage)) {
                     GHWHLOGGER.error("There was an attempt to make an unauthorized request!");
-                    res.status(401);
-                    return "Unauthorized access!";
+                    return new Response("Unauthorized access!", 401);
                 }
             }
-            Class<? extends GithubEvent> eventClass = events.getOrDefault(req.headers("X-GitHub-Event"), UnresolvedEvent.class);
+            Class<? extends GithubEvent> eventClass = events.getOrDefault(httpExchange.getRequestHeaders().getFirst
+                            ("X-GitHub-Event"),
+                    UnresolvedEvent.class);
             GithubEvent event = eventClass.newInstance();
-            Field webhooks = eventClass.getField("webhooks");
-            webhooks.setAccessible(true);
-            webhooks.set(event, this);
-            webhooks.setAccessible(false);
+            event.setWebhooks(this);
 
-            event.parse(req.body());
+            event.bodify(body);
 
             int dispatched = 0;
-            for (EventListener listener : listeners) {
-                Method handle;
-                try {
-                    handle = eventClass.getMethod("handle", eventClass);
-                } catch (NoSuchMethodException ignored) {
-                    continue;
+            for (EventListener listener : getListeners()) {
+                for (Method m : listener.getClass().getMethods()) {
+                    if (m.getName().equals("handle")
+                            && m.getParameterCount() == 1
+                            && m.getParameterTypes()[0].isAssignableFrom(eventClass)) {
+                        m.invoke(listener, event);
+                        dispatched++;
+                        GHWHLOGGER.debug("Dispatching " + listener.getClass().getSimpleName());
+                    }
                 }
-                dispatched++;
-                GHWHLOGGER.info("Dispatching " + listener.getClass().getSimpleName());
-                handle.invoke(listener, event);
             }
-
-            return "\uD83D\uDC4C PERFECT! Dispatched handler count: " + dispatched;
-        });
+            String response = "PERFECT! Dispatched handler count: " + dispatched;
+            return new Response(response);
+        } catch (Exception e) {
+            GHWHLOGGER.error("Something went wrong!", e);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            pw.close();
+            return new Response("<b>Internal error!<br>" + sw.toString(), 500);
+        }
     }
 
     private String hmacSha1Hex(String signWith, String toSign) throws NoSuchAlgorithmException, InvalidKeyException {
@@ -113,13 +142,17 @@ public class GithubWebhooks4J {
         return new String(hexChars);
     }
 
+    private synchronized Set<EventListener> access() {
+        return listeners;
+    }
+
     /**
      * Adds a listener to the listeners list
      *
      * @param listener The listener to add
      */
     public void addListener(EventListener listener) {
-        listeners.add(listener);
+        access().add(listener);
     }
 
     /**
@@ -129,7 +162,7 @@ public class GithubWebhooks4J {
      * @return True if it was removed; False otherwise
      */
     public boolean removeListener(EventListener listener) {
-        return listeners.remove(listener);
+        return access().remove(listener);
     }
 
     /**
@@ -139,7 +172,30 @@ public class GithubWebhooks4J {
      */
     public Set<EventListener> getListeners() {
         Set<EventListener> clone = new HashSet<>();
-        clone.addAll(listeners);
+        clone.addAll(access());
         return clone;
+    }
+
+    /**
+     * Gets the server instance
+     *
+     * @return The server instance
+     */
+    public HttpServer getServer() {
+        return server;
+    }
+
+    private class Response {
+        String response;
+        int code;
+
+        Response(String response, int code) {
+            this.response = response;
+            this.code = code;
+        }
+
+        Response(String response) {
+            this(response, 200);
+        }
     }
 }

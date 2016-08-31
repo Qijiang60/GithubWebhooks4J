@@ -1,5 +1,7 @@
 package com.arsenarsen.githubwebhooks4j;
 
+import java.io.IOException;
+
 /**
  * <br>
  * Created by Arsen on 13.8.2016..
@@ -8,7 +10,7 @@ public class WebhooksBuilder {
 
     private String request = "/webhooks";
     private String secret = "";
-    private int port = -1;
+    private int port = 80;
     private String ip = null;
 
     /**
@@ -33,7 +35,7 @@ public class WebhooksBuilder {
     }
 
     /**
-     * Sets the IP that Spark will bind to. Default: The Spark default
+     * Sets the IP that Spark will bind to. Default: 80
      * @param ip The IP to bind to
      * @return The builder object for chaining
      */
@@ -56,7 +58,7 @@ public class WebhooksBuilder {
      * Builds the webhooks object
      * @return The newly created webhooks object with the specified parameters
      */
-    public GithubWebhooks4J build(){
+    public GithubWebhooks4J build() throws IOException {
         return new GithubWebhooks4J(request, secret, port, ip);
     }
 }
