@@ -42,7 +42,7 @@ public abstract class GithubEvent {
      *
      * @param body The body
      */
-    public void bodify(String body) {
+    public void bodify(String body) throws JsonParseException {
         this.body = body;
         parse(body);
     }

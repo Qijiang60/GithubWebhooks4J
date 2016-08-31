@@ -8,7 +8,8 @@
     <description>A small, easy to use, and work in progress GitHub Webhooks wrapper for Java</description>
     <groupId>com.arsenarsen</groupId>
     <artifactId>githubwebhooks4j</artifactId>
-    <version>1.0.0</version>
+    <!-- TODO Keep bumping -->
+    <version>1.1.0</version>
 
     <licenses>
         <license>

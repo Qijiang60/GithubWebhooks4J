@@ -9,9 +9,10 @@ import java.io.IOException;
 public class WebhooksBuilder {
 
     private String request = "/webhooks";
-    private String secret = "";
+    private String secret = null;
     private int port = 80;
     private String ip = null;
+    private String succesMessage = "\ud83d\udC4c PERFECT! Dispatched handler count: %COUNT";
 
     /**
      * Sets the webhooks request, Default: "/webhooks"
@@ -35,7 +36,7 @@ public class WebhooksBuilder {
     }
 
     /**
-     * Sets the IP that Spark will bind to. Default: 80
+     * Sets the IP that HttpServer will bind to. Default: any available local IP address
      * @param ip The IP to bind to
      * @return The builder object for chaining
      */
@@ -45,7 +46,7 @@ public class WebhooksBuilder {
     }
 
     /**
-     * Sets the port that Spark will bind to. Default: The Spark default
+     * Sets the port that HttpServer will bind to. Default: 80
      * @param port The port to bind to
      * @return The builder object for chaining
      */
@@ -55,10 +56,22 @@ public class WebhooksBuilder {
     }
 
     /**
+     * Sets the success message. Defaults to '👌 PERFECT! Dispatched handler count: %COUNT'
+     *
+     * @param succesMessage The success message. Use %COUNT to include the count
+     * @return The builder object for chaining
+     */
+    public WebhooksBuilder withSuccesMessage(String succesMessage) {
+        this.succesMessage = succesMessage;
+        return this;
+    }
+
+    /**
      * Builds the webhooks object
      * @return The newly created webhooks object with the specified parameters
      */
     public GithubWebhooks4J build() throws IOException {
-        return new GithubWebhooks4J(request, secret, port, ip);
+        return new GithubWebhooks4J(request, secret, port, ip, succesMessage);
     }
+
 }

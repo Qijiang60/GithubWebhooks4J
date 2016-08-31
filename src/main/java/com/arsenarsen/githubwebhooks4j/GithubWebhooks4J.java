@@ -1,6 +1,7 @@
 package com.arsenarsen.githubwebhooks4j;
 
 import com.arsenarsen.githubwebhooks4j.events.*;
+import com.google.gson.JsonParseException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
@@ -51,16 +52,19 @@ public class GithubWebhooks4J {
     private HttpServer server;
     private String secret;
     private Set<EventListener> listeners = new HashSet<>();
+    private String successMessage;
 
     // Locks the default constructor
     private GithubWebhooks4J() {
     }
 
     // Use the builder
-    GithubWebhooks4J(String request, final String secret, int port, String ip) throws IOException {
+    GithubWebhooks4J(String request, final String secret, int port, String ip, String successMessage) throws
+            IOException {
 //        if(!(request.charAt(0) == '/'))
 //            request = '/' + request;
         this.secret = secret;
+        this.successMessage = successMessage;
         if (ip == null)
             server = HttpServer.create(new InetSocketAddress(port), 0);
         else
@@ -68,8 +72,9 @@ public class GithubWebhooks4J {
 
         server.createContext(request, httpExchange -> {
             Response res = callHooks(httpExchange);
-            httpExchange.sendResponseHeaders(res.code, res.response.length());
-            httpExchange.getResponseBody().write(res.response.getBytes());
+            byte[] bytes = res.response.getBytes(StandardCharsets.UTF_8);
+            httpExchange.sendResponseHeaders(res.code, bytes.length);
+            httpExchange.getResponseBody().write(bytes);
             httpExchange.getResponseBody().close();
         });
         server.setExecutor(null);
@@ -87,11 +92,11 @@ public class GithubWebhooks4J {
                         httpExchange.getRequestHeaders().getFirst("Content-Type"));
                 return new Response("Content-Type must be application/json!", 400);
             }
-            if (!secret.equals("")) {
+            if (secret != null) {
                 String signedMessage = httpExchange.getRequestHeaders().getFirst("X-Hub-Signature");
                 if (signedMessage == null)
-                    signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ" +
-                            ""; // Ignore that long Base64 string
+                    signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ";
+                // Ignore that long Base64 string
                 if (!("sha1=" + hmacSha1Hex(secret, body)).equalsIgnoreCase(signedMessage)) {
                     GHWHLOGGER.error("There was an attempt to make an unauthorized request!");
                     return new Response("Unauthorized access!", 401);
@@ -117,15 +122,22 @@ public class GithubWebhooks4J {
                     }
                 }
             }
-            String response = "PERFECT! Dispatched handler count: " + dispatched;
+            String response = successMessage.replace("%COUNT", String.valueOf(dispatched));
             return new Response(response);
+        } catch (JsonParseException e) {
+            GHWHLOGGER.error("Bad request!", e);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            pw.close();
+            return new Response("<b>Bad request!<br>n\n" + sw.toString(), 400);
         } catch (Exception e) {
             GHWHLOGGER.error("Something went wrong!", e);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             pw.close();
-            return new Response("<b>Internal error!<br>" + sw.toString(), 500);
+            return new Response("<b>Internal error!<br>n\n" + sw.toString(), 500);
         }
     }
 
