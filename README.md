@@ -3,18 +3,16 @@ A small, easy to use, and work in progress GitHub Webhooks wrapper for Java.
 ## Obtaining
 To get GitHubWebhooks4J use the snippets below and replace VERSION with the latest version.
 ```xml
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
 ```
 ```xml
         <dependency>
             <groupId>com.arsenarsen</groupId>
             <artifactId>githubwebhooks4j</artifactId>
-            <version>1.1.0</version>
+            <version>VERSION</version>
         </dependency>
 ```
 ## Usage
@@ -24,6 +22,6 @@ To use GitHubWebhooks4J you need to make a new WebhooksBuilder(), then using the
 * Endpoint: /webhooks
 * Success message: 👌 PERFECT! Dispatched handler count: %COUNT
 
-In the success message %COUNT gets interlnally replaced by the amount of dispatched listeners.
+In the success message %COUNT gets internally replaced by the amount of dispatched listeners.
 
 After doing all of that a server, obtainable through getServer() will be started on a background thread waiting for calls from GitHub.
