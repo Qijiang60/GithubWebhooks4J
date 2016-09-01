@@ -1,6 +1,10 @@
 package com.arsenarsen.githubwebhooks4j;
 
+import com.arsenarsen.githubwebhooks4j.events.EventListener;
+
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Makes webhooks
@@ -13,7 +17,19 @@ public class WebhooksBuilder {
     private String secret = null;
     private int port = 8080;
     private String ip = null;
-    private String succesMessage = "\ud83d\udC4c PERFECT! Dispatched handler count: %COUNT";
+    private String successMessage = "\ud83d\udC4c PERFECT! Dispatched handler count: %COUNT";
+    private Set<EventListener> listeners = new HashSet<>();
+
+    /**
+     * Adds a listener
+     *
+     * @param listener The listener to add
+     * @return The builder object for chaining
+     */
+    public WebhooksBuilder addListener(EventListener listener) {
+        listeners.add(listener);
+        return this;
+    }
 
     /**
      * Sets the webhooks request, Default: "/webhooks"
@@ -59,11 +75,11 @@ public class WebhooksBuilder {
     /**
      * Sets the success message. Defaults to '👌 PERFECT! Dispatched handler count: %COUNT'
      *
-     * @param succesMessage The success message. Use %COUNT to include the count
+     * @param successMessage The success message. Use %COUNT to include the count
      * @return The builder object for chaining
      */
-    public WebhooksBuilder withSuccesMessage(String succesMessage) {
-        this.succesMessage = succesMessage;
+    public WebhooksBuilder withSuccesMessage(String successMessage) {
+        this.successMessage = successMessage;
         return this;
     }
 
@@ -72,7 +88,7 @@ public class WebhooksBuilder {
      * @return The newly created webhooks object with the specified parameters
      */
     public GithubWebhooks4J build() throws IOException {
-        return new GithubWebhooks4J(request, secret, port, ip, succesMessage);
+        return new GithubWebhooks4J(request, secret, port, ip, successMessage, listeners);
     }
 
 }

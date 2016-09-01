@@ -59,10 +59,11 @@ public class GithubWebhooks4J {
     }
 
     // Use the builder
-    GithubWebhooks4J(String request, final String secret, int port, String ip, String successMessage) throws
-            IOException {
+    GithubWebhooks4J(String request, final String secret, int port, String ip, String successMessage,
+                     Set<EventListener> listeners) throws IOException {
 //        if(!(request.charAt(0) == '/'))
 //            request = '/' + request;
+        this.listeners.addAll(listeners);
         this.secret = secret;
         this.successMessage = successMessage;
         if (ip == null)
@@ -71,6 +72,8 @@ public class GithubWebhooks4J {
             server = HttpServer.create(new InetSocketAddress(ip, port), 0);
 
         server.createContext(request, httpExchange -> {
+            if (!httpExchange.getProtocol().equals("POST"))
+                return;
             Response res = callHooks(httpExchange);
             byte[] bytes = res.response.getBytes(StandardCharsets.UTF_8);
             httpExchange.sendResponseHeaders(res.code, bytes.length);
@@ -95,8 +98,8 @@ public class GithubWebhooks4J {
             if (secret != null) {
                 String signedMessage = httpExchange.getRequestHeaders().getFirst("X-Hub-Signature");
                 if (signedMessage == null)
+                    // Ignore that long Base64 string
                     signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ";
-                // Ignore that long Base64 string
                 if (!("sha1=" + hmacSha1Hex(secret, body)).equalsIgnoreCase(signedMessage)) {
                     GHWHLOGGER.error("There was an attempt to make an unauthorized request!");
                     return new Response("Unauthorized access!", 401);
