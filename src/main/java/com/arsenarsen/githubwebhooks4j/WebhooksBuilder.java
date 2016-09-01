@@ -3,6 +3,7 @@ package com.arsenarsen.githubwebhooks4j;
 import java.io.IOException;
 
 /**
+ * Makes webhooks
  * <br>
  * Created by Arsen on 13.8.2016..
  */
@@ -10,7 +11,7 @@ public class WebhooksBuilder {
 
     private String request = "/webhooks";
     private String secret = null;
-    private int port = 80;
+    private int port = 8080;
     private String ip = null;
     private String succesMessage = "\ud83d\udC4c PERFECT! Dispatched handler count: %COUNT";
 
@@ -46,7 +47,7 @@ public class WebhooksBuilder {
     }
 
     /**
-     * Sets the port that HttpServer will bind to. Default: 80
+     * Sets the port that HttpServer will bind to. Default: 8080
      * @param port The port to bind to
      * @return The builder object for chaining
      */
