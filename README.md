@@ -10,7 +10,7 @@ To get GitHubWebhooks4J use the snippets below and replace VERSION with the late
 ```
 ```xml
     <dependency>
-        <groupId>com.arsenarsen</groupId>
+        <groupId>com.github.ArsenArsen</groupId>
         <artifactId>githubwebhooks4j</artifactId>
         <version>VERSION</version>
     </dependency>
