@@ -72,7 +72,7 @@ public class GithubWebhooks4J {
             server = HttpServer.create(new InetSocketAddress(ip, port), 0);
 
         server.createContext(request, httpExchange -> {
-            if (!httpExchange.getProtocol().equals("POST"))
+            if (!httpExchange.getRequestMethod().equals("POST"))
                 return;
             Response res = callHooks(httpExchange);
             byte[] bytes = res.response.getBytes(StandardCharsets.UTF_8);
@@ -119,6 +119,7 @@ public class GithubWebhooks4J {
                     if (m.getName().equals("handle")
                             && m.getParameterCount() == 1
                             && m.getParameterTypes()[0].isAssignableFrom(eventClass)) {
+                        m.setAccessible(true);
                         m.invoke(listener, event);
                         dispatched++;
                         GHWHLOGGER.debug("Dispatching " + listener.getClass().getSimpleName());
