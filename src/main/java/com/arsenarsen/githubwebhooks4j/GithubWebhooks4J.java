@@ -72,8 +72,6 @@ public class GithubWebhooks4J {
             server = HttpServer.create(new InetSocketAddress(ip, port), 0);
 
         server.createContext(request, httpExchange -> {
-            if (!httpExchange.getRequestMethod().equals("POST"))
-                return;
             Response res = callHooks(httpExchange);
             byte[] bytes = res.response.getBytes(StandardCharsets.UTF_8);
             httpExchange.sendResponseHeaders(res.code, bytes.length);
@@ -85,6 +83,8 @@ public class GithubWebhooks4J {
     }
 
     private Response callHooks(HttpExchange httpExchange) {
+        if (!httpExchange.getRequestMethod().equals("POST"))
+            return new Response("");
         try {
             BufferedReader r = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody()));
             String line, body = "";
@@ -115,10 +115,11 @@ public class GithubWebhooks4J {
 
             int dispatched = 0;
             for (EventListener listener : getListeners()) {
-                for (Method m : listener.getClass().getMethods()) {
+                for (Method m : listener.getClass().getDeclaredMethods()) {
                     if (m.getName().equals("handle")
                             && m.getParameterCount() == 1
-                            && m.getParameterTypes()[0].isAssignableFrom(eventClass)) {
+                            && m.getParameterTypes()[0].isAssignableFrom(eventClass)
+                            && m.isBridge()) {
                         m.setAccessible(true);
                         m.invoke(listener, event);
                         dispatched++;
