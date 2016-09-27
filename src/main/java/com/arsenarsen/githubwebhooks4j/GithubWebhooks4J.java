@@ -119,7 +119,7 @@ public class GithubWebhooks4J {
                     if (m.getName().equals("handle")
                             && m.getParameterCount() == 1
                             && m.getParameterTypes()[0].isAssignableFrom(eventClass)
-                            && m.isBridge()) {
+                            && !m.isBridge()) {
                         m.setAccessible(true);
                         m.invoke(listener, event);
                         dispatched++;
