@@ -1,6 +1,7 @@
 package com.arsenarsen.githubwebhooks4j.utils;
 
 import com.arsenarsen.githubwebhooks4j.GithubWebhooks4J;
+import com.arsenarsen.githubwebhooks4j.Markers;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -25,7 +26,7 @@ public class Utils {
         try {
             return LocalDateTime.parse(stamp.substring(0, 19)).atZone(ZoneId.of(stamp.substring(19)));
         } catch (Exception e) {
-            GithubWebhooks4J.GHWHLOGGER.error("Could not parse timestamp '{}'! Please send this message to ArsenArsen",
+            GithubWebhooks4J.GHWHLOGGER.error(Markers.UTILS, "Could not parse timestamp '{}'! Please send this message to ArsenArsen",
                     stamp);
             GithubWebhooks4J.GHWHLOGGER.error(null, e);
         }

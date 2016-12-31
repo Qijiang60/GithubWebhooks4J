@@ -1,6 +1,8 @@
 package com.arsenarsen.githubwebhooks4j;
 
 import com.arsenarsen.githubwebhooks4j.events.EventListener;
+import com.arsenarsen.githubwebhooks4j.web.Binder;
+import com.arsenarsen.githubwebhooks4j.web.DefaultBinder;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -19,6 +21,7 @@ public class WebhooksBuilder {
     private String ip = null;
     private String successMessage = "\ud83d\udC4c PERFECT! Dispatched handler count: %COUNT";
     private Set<EventListener> listeners = new HashSet<>();
+    private Binder binder = new DefaultBinder();
 
     /**
      * Adds a listener
@@ -88,7 +91,6 @@ public class WebhooksBuilder {
      * @return The newly created webhooks object with the specified parameters
      */
     public GithubWebhooks4J build() throws IOException {
-        return new GithubWebhooks4J(request, secret, port, ip, successMessage, listeners);
+        return new GithubWebhooks4J(request, secret, port, ip, successMessage, listeners, binder);
     }
-
 }

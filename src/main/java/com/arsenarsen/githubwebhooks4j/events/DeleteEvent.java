@@ -30,45 +30,35 @@ public class DeleteEvent extends GithubEvent {
     }
 
     /**
-     * Gets the ref type connected to the event
-     *
-     * @return The ref type
+     * @return The ref type of the event.
      */
     public RefType getRefType() {
         return ref_type;
     }
 
     /**
-     * Gets the ref connected to the event
-     *
-     * @return The ref
+     * @return The ref connected to the event.-
      */
     public String getRef() {
         return ref;
     }
 
     /**
-     * Gets the pusher type related to the event
-     *
-     * @return The pusher type
+     * @return The pusher type of the event.
      */
     public String getPusherType() {
         return pusherType;
     }
 
     /**
-     * Gets the related repository
-     *
-     * @return The related repository
+     * @return The repository this event happen in.
      */
     public Repository getRepository() {
         return repository;
     }
 
     /**
-     * Gets the sender
-     *
-     * @return The sender
+     * @return The event sender.
      */
     public User getSender() {
         return sender;

@@ -2,8 +2,6 @@ package com.arsenarsen.githubwebhooks4j.events;
 
 /**
  * Something weird happen.. I have no idea what this event that occurred is.
- * <br>
- * Created by Arsen on 13.8.2016..
  */
 public class UnresolvedEvent extends GithubEvent {
     @Override
@@ -11,8 +9,8 @@ public class UnresolvedEvent extends GithubEvent {
     }
 
     /**
-     * Returns the unknown event call body
-     * @return The body
+     * Returns the unknown event call body.
+     * @return The body.
      */
     public String getBody(){
         return toString();

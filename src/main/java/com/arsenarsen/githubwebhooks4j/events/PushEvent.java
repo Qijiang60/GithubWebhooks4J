@@ -9,9 +9,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 /**
- * Represents a push
- * <br>
- * Created by Arsen on 30.8.2016.
+ * Represents a push event.
  */
 public class PushEvent extends GithubEvent {
 
@@ -44,17 +42,13 @@ public class PushEvent extends GithubEvent {
     }
 
     /**
-     * Gets tue ref
-     *
-     * @return The red
+     * @return The ref.
      */
     public String getRef() {
         return ref;
     }
 
     /**
-     * Gets the sha before the commit
-     *
      * @return The SHA of the most recent commit on ref before the push.
      */
     public String getBefore() {
@@ -62,44 +56,34 @@ public class PushEvent extends GithubEvent {
     }
 
     /**
-     * Gets the sha after the commit
-     *
-     * @return The SHA after the commit
+     * @return The SHA after the commit.
      */
     public String getAfter() {
         return after;
     }
 
     /**
-     * Checks is created equal to true
-     *
-     * @return True if it is
+     * @return True if it is.
      */
     public boolean isCreated() {
         return created;
     }
 
     /**
-     * Checks if is delete is true
-     *
-     * @return True if it is
+     * @return Value of the deleted field.
      */
     public boolean isDeleted() {
         return deleted;
     }
 
     /**
-     * Checks is the push forced
-     *
-     * @return True if it is forced
+     * @return True if the push is forced
      */
     public boolean isForced() {
         return forced;
     }
 
     /**
-     * Gets the commit diffs url
-     *
      * @return The diff/compare URL
      */
     public String getCompare() {
@@ -107,36 +91,28 @@ public class PushEvent extends GithubEvent {
     }
 
     /**
-     * Gets the commits
-     *
-     * @return The commits
+     * @return The commits that happen
      */
     public Commit[] getCommits() {
         return commits;
     }
 
     /**
-     * Gets the repository
-     *
-     * @return The repository
+     * @return The repository the commit was pushed to.
      */
     public Repository getRepository() {
         return repository;
     }
 
     /**
-     * Gets the pusher
-     *
-     * @return The pusher
+     * @return The pusher of the commit,.
      */
     public Pusher getPusher() {
         return pusher;
     }
 
     /**
-     * Gets the sender
-     *
-     * @return The sender
+     * @return The sender of the commit.
      */
     public User getSender() {
         return sender;

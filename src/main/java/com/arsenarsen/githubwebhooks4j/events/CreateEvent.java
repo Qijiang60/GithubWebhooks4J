@@ -8,9 +8,7 @@ import com.google.gson.JsonParser;
 
 /**
  * Fires on a tag, branch or repository creation<br>
- * Look here: https://developer.github.com/v3/activity/events/types/#createevent
- * <br>
- * Created by Arsen on 15.8.2016..
+ * Look <a href="https://developer.github.com/v3/activity/events/types/#createevent">here</a>.
  */
 public class CreateEvent extends GithubEvent {
     private RefType ref_type;
@@ -34,63 +32,49 @@ public class CreateEvent extends GithubEvent {
     }
 
     /**
-     * Gets the ref type connected to the event
-     *
-     * @return The ref type
+     * @return The ref type.
      */
     public RefType getRefType() {
         return ref_type;
     }
 
     /**
-     * Gets the ref connected to the event
-     *
-     * @return The ref
+     * @return The ref.
      */
     public String getRef() {
         return ref;
     }
 
     /**
-     * Gets the pusher type related to the event
-     *
-     * @return The pusher type
+     * @return The pusher type.
      */
     public String getPusherType() {
         return pusherType;
     }
 
     /**
-     * Gets the repository description
-     *
-     * @return The repository description
+     * @return The repository description.
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Gets the master branch name of the repository
-     *
-     * @return The master branch name
+     * @return The master branch name.
      */
     public String getMasterBranch() {
         return masterBranch;
     }
 
     /**
-     * Gets the related repository
-     *
-     * @return The related repository
+     * @return The repository this event occured in.
      */
     public Repository getRepository() {
         return repository;
     }
 
     /**
-     * Gets the sender
-     *
-     * @return The sender
+     * @return The sender.
      */
     public User getSender() {
         return sender;
