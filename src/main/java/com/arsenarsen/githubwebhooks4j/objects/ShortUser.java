@@ -2,8 +2,6 @@ package com.arsenarsen.githubwebhooks4j.objects;
 
 /**
  * A short representation of user made for a Commit
- * <br>
- * Created by Arsen on 31.8.2016.
  */
 public class ShortUser {
     protected String name;
@@ -11,27 +9,21 @@ public class ShortUser {
     protected String username;
 
     /**
-     * Gets the name of this user
-     *
-     * @return The name
+     * @return The name of this user.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Gets the email of this user
-     *
-     * @return The email
+     * @return The email of this user.
      */
     public String getEmail() {
         return email;
     }
 
     /**
-     * Gets the username of this user
-     *
-     * @return The username
+     * @return This user's username.
      */
     public String getUsername() {
         return username;

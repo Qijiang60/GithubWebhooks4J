@@ -7,13 +7,18 @@ import java.util.Iterator;
 
 public enum Markers implements Marker {
     /**
-     * Zen lookup marker
+     * Zen lookup marker.
      */
     ZEN,
     /**
-     * The API marker that logs everything from the EventHandler
+     * The API marker that logs everything from the EventHandler.
      */
-    HANDLER;
+    HANDLER,
+    /**
+     * +
+     * Marker for all utils.
+     */
+    UTILS;
 
     private final Marker parent;
 

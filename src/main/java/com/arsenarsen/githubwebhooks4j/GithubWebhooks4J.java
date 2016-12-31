@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * GitHub webhooks main class, containing an interface to pretty much everything
- * Use WebhooksBuilder to create this class
+ * GitHub webhooks main class, containing an interface to pretty much everything.
+ * Use WebhooksBuilder to create this class.
  */
 public class GithubWebhooks4J {
 
@@ -153,39 +153,37 @@ public class GithubWebhooks4J {
     }
 
     /**
-     * Adds a listener to the listeners list
+     * Adds a listener to the listeners list.
      *
-     * @param listener The listener to add
+     * @param listener The listener to add.
      */
     public void addListener(EventListener listener) {
         listeners.add(listener);
     }
 
     /**
-     * Removes a listener from the listener list
+     * Removes a listener from the listener list.
      *
-     * @param listener The listener to remove
-     * @return True if it was removed; False otherwise
+     * @param listener The listener to remove.
+     * @return True if it was removed; False otherwise.
      */
     public boolean removeListener(EventListener listener) {
         return listeners.remove(listener);
     }
 
     /**
-     * Gets all currently registered listeners
+     * Gets all currently registered listeners.
      *
-     * @return The listeners in a set that is a clone of the registry
+     * @return The listeners in a set that is a clone of the registry.
      */
     public Set<EventListener> getListeners() {
         return Collections.unmodifiableSet(listeners);
     }
 
     /**
-     * Gets the server instance
-     *
-     * @return The server instance
+     * @return The binder instance.
      */
-    public Binder getServer() {
+    public Binder getBinder() {
         return binder;
     }
 

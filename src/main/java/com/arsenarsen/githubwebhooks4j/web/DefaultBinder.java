@@ -11,10 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Default Binder implementation that uses a {@link HttpServer}.
+ */
 public class DefaultBinder implements Binder {
+    @SuppressWarnings("FieldCanBeLocal")
+    private HttpServer server;
+
     @Override
     public void bind(String request, String ip, int port, GithubWebhooks4J webhooks) throws IOException {
-        HttpServer server;
         if (ip == null)
             server = HttpServer.create(new InetSocketAddress(port), 0);
         else

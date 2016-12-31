@@ -17,16 +17,16 @@ public class Response {
     }
 
     /**
-     * @return The currently set HTTP Response code
+     * @return The currently set HTTP Response code.
      */
     public int getCode() {
         return code;
     }
 
     /**
-     * Updates the set HTTP Response code with a new one
+     * Updates the set HTTP Response code with a new one.
      *
-     * @param code The new response code
+     * @param code The new response code.
      */
     public void setCode(int code) {
         this.code = code;

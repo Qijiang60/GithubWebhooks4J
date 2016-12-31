@@ -1,4 +1,4 @@
-# GitHubWebhooks4J [![](https://jitpack.io/v/ArsenArsen/GithubWebhooks4J.svg)](https://jitpack.io/#ArsenArsen/GithubWebhooks4J) [![Build Status](https://drone.io/github.com/ArsenArsen/GithubWebhooks4J/status.png)](https://drone.io/github.com/ArsenArsen/GithubWebhooks4J/latest) ![Dependicies](https://www.versioneye.com/user/projects/57c82382968d640049e12720/badge.svg?style=flat-square)
+# GitHubWebhooks4J [![](https://jitpack.io/v/ArsenArsen/GithubWebhooks4J.svg)](https://jitpack.io/#ArsenArsen/GithubWebhooks4J)
 A small, easy to use, and work in progress GitHub Webhooks wrapper for Java.
 ## Obtaining
 To get GitHubWebhooks4J use the snippets below and replace VERSION with the latest version.
@@ -21,6 +21,7 @@ To use GitHubWebhooks4J you need to make a new WebhooksBuilder(), then using the
 * IP: Any local IP address
 * Endpoint: /webhooks
 * Success message: 👌 PERFECT! Dispatched handler count: %COUNT 
+* Binder: `new DefaultBinder()`
 In the success message %COUNT gets internally replaced by the amount of dispatched listeners.
 
 At the end, to get the webhooks, just execute .build() and handle the possible IOExcepiton, due to bind error most oftenly. 

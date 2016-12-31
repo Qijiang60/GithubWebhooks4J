@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Internally used class to describe a route to GithubWebhooks4J
+ * Passed to {@link com.arsenarsen.githubwebhooks4j.GithubWebhooks4J#callHooks(HTTPRequest)} for processing from a {@link Binder}
  */
 public class HTTPRequest {
     private String requestMethod;
@@ -17,14 +17,23 @@ public class HTTPRequest {
         this.requestHeaders = requestHeaders;
     }
 
+    /**
+     * @return The request method used.
+     */
     public String getRequestMethod() {
         return requestMethod;
     }
 
+    /**
+     * @return Request body, as an input stream
+     */
     public InputStream getRequestBody() {
         return requestBody;
     }
 
+    /**
+     * @return The request headers.
+     */
     public Map<String, String> getRequestHeaders() {
         return requestHeaders;
     }
