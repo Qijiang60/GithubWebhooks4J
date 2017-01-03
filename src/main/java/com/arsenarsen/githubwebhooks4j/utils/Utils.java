@@ -35,6 +35,13 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Uppercase all keys in a map
+     *
+     * @param map The map whose keys to uppercase
+     * @param <V> Automatically inferred
+     * @return The map after the keys are uppercase
+     */
     public static <V> Map<String, V> uppercaseKeys(Map<String, V> map) {
         Map<String, V> uppercased = new HashMap<>();
         map.entrySet().forEach(e -> uppercased.put(e.getKey().toUpperCase(), e.getValue()));
