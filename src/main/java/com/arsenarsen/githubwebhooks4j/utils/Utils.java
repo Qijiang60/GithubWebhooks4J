@@ -6,6 +6,8 @@ import com.arsenarsen.githubwebhooks4j.Markers;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Some utilities
@@ -31,5 +33,11 @@ public class Utils {
             GithubWebhooks4J.GHWHLOGGER.error(null, e);
         }
         return null;
+    }
+
+    public static <V> Map<String, V> uppercaseKeys(Map<String, V> map) {
+        Map<String, V> uppercased = new HashMap<>();
+        map.entrySet().forEach(e -> uppercased.put(e.getKey().toUpperCase(), e.getValue()));
+        return uppercased;
     }
 }

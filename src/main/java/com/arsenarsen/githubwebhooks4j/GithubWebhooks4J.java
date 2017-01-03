@@ -1,6 +1,7 @@
 package com.arsenarsen.githubwebhooks4j;
 
 import com.arsenarsen.githubwebhooks4j.events.*;
+import com.arsenarsen.githubwebhooks4j.utils.Utils;
 import com.arsenarsen.githubwebhooks4j.web.Binder;
 import com.arsenarsen.githubwebhooks4j.web.HTTPRequest;
 import com.arsenarsen.githubwebhooks4j.web.Response;
@@ -83,9 +84,10 @@ public class GithubWebhooks4J {
             String line, body = "";
             while ((line = r.readLine()) != null)
                 body += line;
-            if (!httpExchange.getRequestHeaders().getOrDefault("Content-Type", "").equals("application/json")) {
+            if (!Utils.uppercaseKeys(httpExchange.getRequestHeaders())
+                    .getOrDefault("CONTENT-TYPE", "").equalsIgnoreCase("application/json")) {
                 GHWHLOGGER.error(Markers.HANDLER, "There was an attempt to make a non JSON POST request! The request type was: " +
-                        httpExchange.getRequestHeaders().getOrDefault("Content-Type", "empty"));
+                        httpExchange.getRequestHeaders().getOrDefault("CONTENT-TYPE", "empty"));
                 return new Response("Content-Type must be application/json!", 400);
             }
             if (secret != null) {
