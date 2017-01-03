@@ -84,14 +84,14 @@ public class GithubWebhooks4J {
             String line, body = "";
             while ((line = r.readLine()) != null)
                 body += line;
-            if (!Utils.uppercaseKeys(httpExchange.getRequestHeaders())
-                    .getOrDefault("CONTENT-TYPE", "").equalsIgnoreCase("application/json")) {
+            Map<String, String> headers = Utils.uppercaseKeys(httpExchange.getRequestHeaders());
+            if (!headers.getOrDefault("CONTENT-TYPE", "").equalsIgnoreCase("application/json")) {
                 GHWHLOGGER.error(Markers.HANDLER, "There was an attempt to make a non JSON POST request! The request type was: " +
-                        httpExchange.getRequestHeaders().getOrDefault("CONTENT-TYPE", "empty"));
+                        headers.getOrDefault("CONTENT-TYPE", "empty"));
                 return new Response("Content-Type must be application/json!", 400);
             }
             if (secret != null) {
-                String signedMessage = httpExchange.getRequestHeaders().get("X-Hub-Signature");
+                String signedMessage = headers.get("X-HUB-SIGNATURE");
                 if (signedMessage == null)
                     // Ignore that long Base64 string
                     signedMessage = "sha0=Tm90aGluZyB0byBzZWUgaGVyZSBwYWxzLi4gS2VlcCBvbiByZWFkaW5nIG15IHNvdXJjZQ";
@@ -100,7 +100,7 @@ public class GithubWebhooks4J {
                     return new Response("Unauthorized access!", 401);
                 }
             }
-            Class<? extends GithubEvent> eventClass = events.getOrDefault(httpExchange.getRequestHeaders().get("X-GitHub-Event"),
+            Class<? extends GithubEvent> eventClass = events.getOrDefault(headers.get("X-GITHUB-EVENT"),
                     UnresolvedEvent.class);
             GithubEvent event = eventClass.newInstance();
             event.setWebhooks(this);
