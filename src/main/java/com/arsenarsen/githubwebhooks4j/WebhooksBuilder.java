@@ -36,10 +36,11 @@ public class WebhooksBuilder {
 
     /**
      * Sets the webhooks request, Default: "/webhooks"
+     *
      * @param request Route to map to the listener
      * @return The builder object for chaining
      */
-    public WebhooksBuilder forRequest(String request){
+    public WebhooksBuilder forRequest(String request) {
         this.request = request;
         return this;
     }
@@ -47,30 +48,33 @@ public class WebhooksBuilder {
     /**
      * Sets the webhooks secret, Default: ""<br>
      * <b>Never</b> hardcode the token into your app!
+     *
      * @param secret The secret
      * @return The builder object for chaining
      */
-    public WebhooksBuilder withSecret(String secret){
+    public WebhooksBuilder withSecret(String secret) {
         this.secret = secret;
         return this;
     }
 
     /**
      * Sets the IP that HttpServer will bind to. Default: any available local IP address
+     *
      * @param ip The IP to bind to
      * @return The builder object for chaining
      */
-    public WebhooksBuilder withIp(String ip){
+    public WebhooksBuilder withIp(String ip) {
         this.ip = ip;
         return this;
     }
 
     /**
      * Sets the port that HttpServer will bind to. Default: 8080
+     *
      * @param port The port to bind to
      * @return The builder object for chaining
      */
-    public WebhooksBuilder onPort(int port){
+    public WebhooksBuilder onPort(int port) {
         this.port = port;
         return this;
     }
@@ -87,7 +91,19 @@ public class WebhooksBuilder {
     }
 
     /**
+     * Sets the success message. Defaults to <code>new Binder()</code>
+     *
+     * @param binder Binder to use.
+     * @return The builder object for chaining
+     */
+    public WebhooksBuilder withBinder(Binder binder) {
+        this.binder = binder;
+        return this;
+    }
+
+    /**
      * Builds the webhooks object
+     *
      * @return The newly created webhooks object with the specified parameters
      */
     public GithubWebhooks4J build() throws IOException {
